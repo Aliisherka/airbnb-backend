@@ -4,36 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import HttpError from '../utils/HttpError';
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { phoneNumber, password } = req.body;
-
-    if (!phoneNumber || !password) {
-      const error = new HttpError('All fields are required', 400);
-      return next(error);
-    }
-
-    const existingUser = await User.findOne({ phoneNumber });
-    if (existingUser) {
-      const error = new HttpError('Phone number already in use', 400);
-      return next(error);
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ phoneNumber, password: hashedPassword });
-    await newUser.save();
-
-    res.status(201).send({
-      data: {
-        phoneNumber
-      }
-    })
-  } catch (err) {
-    next(err);
-  }
-}
-
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { phoneNumber, password } = req.body;
 
@@ -41,14 +12,19 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return next(new HttpError('All fields are required', 400));
     }
 
-    const user = await User.findOne({ phoneNumber });
-    if (!user) {
-      return next(new HttpError('Incorrect email or password', 401));
-    }
+    let user = await User.findOne({ phoneNumber });
+    let isNewUser = false;
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return next(new HttpError('Incorrect email or password', 401));
+    if (user) {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return next(new HttpError('Incorrect phone number or password', 401));
+      }
+    } else {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user = new User({ phoneNumber, password: hashedPassword });
+      await user.save();
+      isNewUser = true;
     }
 
     const token = jwt.sign(
@@ -59,7 +35,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     res.status(200).json({
       data: {
-        message: 'Login successful',
+        message: isNewUser ? 'Registration successful' : 'Login successful',
         token,
         user: {
           id: user._id,
@@ -68,6 +44,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       },
     });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
