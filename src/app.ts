@@ -1,11 +1,16 @@
 require('dotenv').config();
 import express from 'express';
 import mongoose from 'mongoose';
-
+import cors from 'cors';
 import userRouter from './routes/user';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://aliisherka.github.io'],
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
