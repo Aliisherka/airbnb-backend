@@ -14,13 +14,13 @@ export const getHouses = async (req: Request, res: Response, next: NextFunction)
 export const createHouse = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { title, country, price, rating } = req.body;
-    const imageUrl = req.file?.path;
+    const imageUrls = (req.files as Express.Multer.File[])?.map(file => file.path);
 
-    if (!title || !price || !rating || !imageUrl) {
+    if (!title || !price || !rating || !imageUrls) {
       return next(new HttpError('All fields are required', 400));
     }
 
-    const newHouse = new House({ title, country, price, rating, image: imageUrl });
+    const newHouse = new House({ title, country, price, rating, images: imageUrls });
 
     await newHouse.save();
     res.status(201).json(newHouse);
