@@ -11,6 +11,20 @@ export const getHouses = async (req: Request, res: Response, next: NextFunction)
   }
 }
 
+export const getHouseById = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
+  try {
+    const house = await House.findById(id); // Ищем дом по _id
+    if (!house) {
+      return next(new HttpError('Дом не найден', 404));
+    }
+    res.json(house);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const createHouse = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { title, country, price, rating } = req.body;
