@@ -6,6 +6,7 @@ interface IHouse {
   rating: number;
   images: string[];
   country: string;
+  city: string;
 }
 
 const HouseSchema = new mongoose.Schema<IHouse>({
@@ -26,6 +27,10 @@ const HouseSchema = new mongoose.Schema<IHouse>({
     required: true
   },
   country: {
+    type: String,
+    required: true
+  },
+  city: {
     type: String,
     required: true
   }
