@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://aliisherka.github.io'],
+  origin: ['http://localhost:5173', 'http://192.168.0.74:5173', 'https://aliisherka.github.io'],
   credentials: true,
 }));
 
