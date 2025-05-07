@@ -28,14 +28,14 @@ export const getHouseById = async (req: Request, res: Response, next: NextFuncti
 
 export const createHouse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, country, price, rating, city } = req.body;
+    const { title, country, price, rating, city, guests, bedrooms, beds, bathrooms } = req.body;
     const imageUrls = (req.files as Express.Multer.File[])?.map(file => file.path);
 
-    if (!title || !price || !rating || !imageUrls || !city) {
+    if (!title || !price || !rating || !imageUrls || !city || !guests || !bedrooms || !beds || !bathrooms) {
       return next(new HttpError('All fields are required', 400));
     }
 
-    const newHouse = new House({ title, country, price, rating, images: imageUrls, city });
+    const newHouse = new House({ title, country, price, rating, images: imageUrls, city, guests, bedrooms, beds, bathrooms });
 
     await newHouse.save();
     res.status(201).json(newHouse);

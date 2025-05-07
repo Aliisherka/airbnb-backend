@@ -2,11 +2,15 @@ import mongoose from "mongoose";
 
 interface IHouse {
   title: string;
-  price: string;
+  price: number;
   rating: number;
   images: string[];
   country: string;
   city: string;
+  guests: number;
+  bedrooms: number;
+  beds: number;
+  bathrooms: number;
 }
 
 const HouseSchema = new mongoose.Schema<IHouse>({
@@ -15,7 +19,7 @@ const HouseSchema = new mongoose.Schema<IHouse>({
     required: true
   },
   price: {
-    type: String,
+    type: Number,
     required: true
   },
   rating: {
@@ -33,7 +37,23 @@ const HouseSchema = new mongoose.Schema<IHouse>({
   city: {
     type: String,
     required: true
+  },
+  guests: { 
+    type: Number, 
+    required: true 
+  },
+  bedrooms: { 
+    type: Number, 
+    required: true 
+  },
+  beds: { 
+    type: Number, 
+    required: true 
+  },
+  bathrooms: { 
+    type: Number, 
+    required: true 
   }
-}, { timestamps: true })
+}, { timestamps: true, versionKey: false })
 
 export default mongoose.model<IHouse>('House', HouseSchema);
