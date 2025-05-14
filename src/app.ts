@@ -2,6 +2,7 @@ require('dotenv').config();
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import './cron/clearOldBookings';
 import userRouter from './routes/user';
 import houseRouter from './routes/house';
 

@@ -87,7 +87,9 @@ export const searchHouses = async (req: Request, res: Response, next: NextFuncti
       location, 
       totalAdults = '0',
       pets = '0',
-      infants = '0'
+      infants = '0',
+      arrival,
+      departure
     } = req.query;
 
     const totalGuests = parseInt(totalAdults as string);
@@ -116,7 +118,21 @@ export const searchHouses = async (req: Request, res: Response, next: NextFuncti
       ];
     }
 
-    const houses = await House.find(query);
+    const arrivalDate = arrival ? new Date(arrival as string) : null;
+    const departureDate = departure ? new Date(departure as string) : null;
+
+    if (arrivalDate && departureDate) {
+      query.bookedDates = {
+        $not: {
+          $elemMatch: {
+            arrival: { $lt: departureDate },
+            departure: { $gt: arrivalDate }
+          }
+        }
+      };
+    }
+
+    const houses = await House.find(query).sort({ createdAt: -1 });
 
     res.status(200).json(houses);
   } catch (err) {
