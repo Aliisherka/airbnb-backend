@@ -28,14 +28,51 @@ export const getHouseById = async (req: Request, res: Response, next: NextFuncti
 
 export const createHouse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, country, price, rating, city, guests, bedrooms, beds, bathrooms } = req.body;
+    const { 
+      title, 
+      country, 
+      price, 
+      rating, 
+      city, 
+      guests, 
+      bedrooms, 
+      beds, 
+      bathrooms,
+      allowPets = false,
+      allowInfants = false,
+      maxPets = 0,
+      maxInfants = 0
+    } = req.body;
     const imageUrls = (req.files as Express.Multer.File[])?.map(file => file.path);
 
     if (!title || !price || !rating || !imageUrls || !city || !guests || !bedrooms || !beds || !bathrooms) {
       return next(new HttpError('All fields are required', 400));
     }
 
-    const newHouse = new House({ title, country, price, rating, images: imageUrls, city, guests, bedrooms, beds, bathrooms });
+    if (allowInfants && (!maxInfants || maxInfants < 1)) {
+      return next(new HttpError('You must specify maxInfants if infants are allowed', 400));
+    }
+    
+    if (allowPets && (!maxPets || maxPets < 1)) {
+      return next(new HttpError('You must specify maxPets if pets are allowed', 400));
+    }
+
+    const newHouse = new House({
+      title,
+      country,
+      price,
+      rating,
+      images: imageUrls,
+      city,
+      guests,
+      bedrooms,
+      beds,
+      bathrooms,
+      allowPets: Boolean(allowPets),
+      allowInfants: Boolean(allowInfants),
+      maxInfants: allowInfants ? maxInfants : 0,
+      maxPets: allowPets ? maxPets : 0
+    });
 
     await newHouse.save();
     res.status(201).json(newHouse);
@@ -46,19 +83,40 @@ export const createHouse = async (req: Request, res: Response, next: NextFunctio
 
 export const searchHouses = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { location } = req.query;
-    if (!location || typeof location !== 'string') {
-      return next(new HttpError('Location parameter is required and must be a string', 400));
+    const { 
+      location, 
+      totalAdults = '0',
+      pets = '0',
+      infants = '0'
+    } = req.query;
+
+    const totalGuests = parseInt(totalAdults as string);
+
+    const query: any = {};
+
+    if (!isNaN(totalGuests) && totalGuests > 0) {
+      query.guests = { $gte: totalGuests };
     }
 
-    const searchLocation = transliterate(location.trim().toLowerCase());
+    if (parseInt(infants as string) > 0) {
+      query.allowInfants = true;
+      query.maxInfants = { $gte: infants };
+    }
 
-    const houses = await House.find({
-      $or: [
-        { city: { $regex: new RegExp(searchLocation, "i") } },
-        { country: { $regex: new RegExp(searchLocation, "i") } },
-      ],
-    });
+    if (parseInt(pets as string) > 0) {
+      query.allowPets = true;
+      query.maxPets = { $gte: pets };
+    }
+
+    if (location && typeof location === 'string') {
+      const searchLocation = transliterate(location.trim().toLowerCase());
+      query.$or = [
+        { city: { $regex: new RegExp(searchLocation, 'i') } },
+        { country: { $regex: new RegExp(searchLocation, 'i') } }
+      ];
+    }
+
+    const houses = await House.find(query);
 
     res.status(200).json(houses);
   } catch (err) {
