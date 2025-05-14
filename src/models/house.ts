@@ -15,7 +15,16 @@ interface IHouse {
   maxPets?: number;
   allowInfants?: boolean;
   maxInfants?: number;
+  bookedDates: { arrival: Date; departure: Date }[];
 }
+
+const BookedDateSchema = new mongoose.Schema(
+  {
+    arrival: { type: Date, required: true },
+    departure: { type: Date, required: true },
+  },
+  { _id: false }
+);
 
 const HouseSchema = new mongoose.Schema<IHouse>({
   title: {
@@ -73,6 +82,10 @@ const HouseSchema = new mongoose.Schema<IHouse>({
   maxInfants: { 
     type: Number, 
     default: 0 
+  },
+  bookedDates: {
+    type: [BookedDateSchema],
+    default: []
   }
 }, { timestamps: true, versionKey: false })
 
