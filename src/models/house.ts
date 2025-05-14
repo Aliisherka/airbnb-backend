@@ -11,6 +11,10 @@ interface IHouse {
   bedrooms: number;
   beds: number;
   bathrooms: number;
+  allowPets?: boolean;
+  maxPets?: number;
+  allowInfants?: boolean;
+  maxInfants?: number;
 }
 
 const HouseSchema = new mongoose.Schema<IHouse>({
@@ -53,6 +57,22 @@ const HouseSchema = new mongoose.Schema<IHouse>({
   bathrooms: { 
     type: Number, 
     required: true 
+  },
+  allowPets: {
+    type: Boolean,
+    default: false
+  },
+  maxPets: { 
+    type: Number, 
+    default: 0 
+  },
+  allowInfants: {
+    type: Boolean,
+    default: false
+  },
+  maxInfants: { 
+    type: Number, 
+    default: 0 
   }
 }, { timestamps: true, versionKey: false })
 
