@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { transliterate } from 'transliteration';
 import House from "../models/house";
 import HttpError from '../utils/HttpError';
+import { resolveLocation } from '../utils/locationHelper';
 
 export const getHouses = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -111,11 +111,14 @@ export const searchHouses = async (req: Request, res: Response, next: NextFuncti
     }
 
     if (location && typeof location === 'string') {
-      const searchLocation = transliterate(location.trim().toLowerCase());
-      query.$or = [
-        { city: { $regex: new RegExp(searchLocation, 'i') } },
-        { country: { $regex: new RegExp(searchLocation, 'i') } }
-      ];
+      const resolved = await resolveLocation(location);
+      if (resolved.country) {
+        query.country = resolved.country;
+      } else if (resolved.city) {
+        query.city = resolved.city;
+      } else {
+        return next(new HttpError('Location not found', 400));
+      }
     }
 
     const arrivalDate = arrival ? new Date(arrival as string) : null;
