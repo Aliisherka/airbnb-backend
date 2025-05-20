@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import House from "../models/house";
+import { getCurrencyByCountry } from '../utils/currency';
 import HttpError from '../utils/HttpError';
 import { resolveLocation } from '../utils/locationHelper';
 
@@ -44,6 +45,7 @@ export const createHouse = async (req: Request, res: Response, next: NextFunctio
       maxInfants = 0
     } = req.body;
     const imageUrls = (req.files as Express.Multer.File[])?.map(file => file.path);
+    const currency = getCurrencyByCountry(country)
 
     if (!title || !price || !rating || !imageUrls || !city || !guests || !bedrooms || !beds || !bathrooms) {
       return next(new HttpError('All fields are required', 400));
@@ -61,6 +63,7 @@ export const createHouse = async (req: Request, res: Response, next: NextFunctio
       title,
       country,
       price,
+      currency,
       rating,
       images: imageUrls,
       city,
