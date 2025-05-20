@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 interface IHouse {
   title: string;
   price: number;
+  currency: string;
   rating: number;
   images: string[];
   country: string;
@@ -33,6 +34,10 @@ const HouseSchema = new mongoose.Schema<IHouse>({
   },
   price: {
     type: Number,
+    required: true
+  },
+  currency: {
+    type: String,
     required: true
   },
   rating: {
