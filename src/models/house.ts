@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 interface IHouse {
   title: string;
@@ -17,6 +17,7 @@ interface IHouse {
   allowInfants?: boolean;
   maxInfants?: number;
   bookedDates: { arrival: Date; departure: Date }[];
+  userId: Types.ObjectId
 }
 
 const BookedDateSchema = new mongoose.Schema(
@@ -91,6 +92,11 @@ const HouseSchema = new mongoose.Schema<IHouse>({
   bookedDates: {
     type: [BookedDateSchema],
     default: []
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 }, { timestamps: true, versionKey: false })
 

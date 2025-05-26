@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import House from "../models/house";
 import { getCurrencyByCountry } from '../utils/currency';
 import HttpError from '../utils/HttpError';
@@ -17,7 +18,7 @@ export const getHouseById = async (req: Request, res: Response, next: NextFuncti
   const { id } = req.params;
 
   try {
-    const house = await House.findById(id); // Ищем дом по _id
+    const house = await House.findById(id);
     if (!house) {
       return next(new HttpError('Дом не найден', 404));
     }
@@ -27,7 +28,7 @@ export const getHouseById = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const createHouse = async (req: Request, res: Response, next: NextFunction) => {
+export const createHouse = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { 
       title, 
@@ -74,7 +75,8 @@ export const createHouse = async (req: Request, res: Response, next: NextFunctio
       allowPets: Boolean(allowPets),
       allowInfants: Boolean(allowInfants),
       maxInfants: allowInfants ? maxInfants : 0,
-      maxPets: allowPets ? maxPets : 0
+      maxPets: allowPets ? maxPets : 0,
+      userId: req.user?.userId,
     });
 
     await newHouse.save();

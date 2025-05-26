@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import HttpError from '../utils/HttpError';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -40,6 +41,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
         user: {
           id: user._id,
           phoneNumber: user.phoneNumber,
+          name: user.name || null,
         },
       },
     });
@@ -47,3 +49,18 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     next(err);
   }
 };
+
+export const completeProfile = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const { name } = req.body;
+    if (!name) return next(new HttpError('Name is required', 400));
+    const user = await User.findByIdAndUpdate(
+      req.user?.userId,
+      { name },
+      { new: true }
+    );
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+}
