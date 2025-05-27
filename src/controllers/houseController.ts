@@ -18,7 +18,7 @@ export const getHouseById = async (req: Request, res: Response, next: NextFuncti
   const { id } = req.params;
 
   try {
-    const house = await House.findById(id).populate('userId', 'phoneNumber name createdAt');
+    const house = await House.findById(id).populate('userId', 'phoneNumber name createdAt avatarUrl');
     if (!house) {
       return next(new HttpError('Дом не найден', 404));
     }

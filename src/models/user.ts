@@ -4,6 +4,7 @@ interface IUser {
   phoneNumber: string;
   password: string;
   name?: string;
+  avatarUrl?: string;
 }
 
 const UserSchema = new mongoose.Schema<IUser>({
@@ -17,6 +18,9 @@ const UserSchema = new mongoose.Schema<IUser>({
     required: true,
   },
   name: {
+    type: String,
+  },
+  avatarUrl: {
     type: String,
   }
 }, { timestamps: true, versionKey: false })
