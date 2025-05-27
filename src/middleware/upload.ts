@@ -12,7 +12,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
+const houseImageStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => ({
     folder: 'airbnb-houses',
@@ -20,6 +20,15 @@ const storage = new CloudinaryStorage({
   }),
 });
 
-const upload = multer({ storage });
+export const uploadHouseImages = multer({ storage: houseImageStorage });
 
-export default upload;
+const avatarStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => ({
+    folder: 'airbnb-avatars',
+    public_id: `avatar-${Date.now()}-${uuidv4()}`,
+    transformation: [{ width: 300, height: 300, crop: 'fill', gravity: 'face' }],
+  })
+});
+
+export const uploadAvatar = multer({ storage: avatarStorage });
