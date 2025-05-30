@@ -4,7 +4,8 @@ interface IHouse {
   title: string;
   price: number;
   currency: string;
-  rating: number;
+  avgRating: number;
+  reviewCount: number;
   images: string[];
   country: string;
   city: string;
@@ -41,9 +42,13 @@ const HouseSchema = new mongoose.Schema<IHouse>({
     type: String,
     required: true
   },
-  rating: {
+  avgRating: {
     type: Number,
-    required: true
+    default: 0
+  },
+  reviewCount: {
+    type: Number,
+    default: 0
   },
   images: {
     type: [String],
