@@ -5,6 +5,7 @@ import cors from 'cors';
 import './cron/clearOldBookings';
 import userRouter from './routes/user';
 import houseRouter from './routes/house';
+import reviewRouter from './routes/review';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 
 app.use('/', userRouter);
 app.use('/', houseRouter);
+app.use('/', reviewRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
